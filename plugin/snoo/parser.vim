@@ -25,13 +25,8 @@ function! snoo#parser#parseSubreddit(res, subreddit)
 		endif
 	endif
 
-	" silent put = string(json)
-
-	" let json = json_decode(a:res)
-	" for id in keys(json)
-	" silent put = json[id]
-	" endfor
-	" silent put = json
+	" We jump to the top of the page
+	execute "normal! gg"
 endfunction
 
 function! snoo#parser#parsePostLine(postLine)
@@ -95,8 +90,12 @@ function! snoo#parser#parsePost(post)
 	silent put = l:commentsTitle
 	silent put = l:newline
 
+	" We display the comments
 	let l:comments = json[1].data.children
 	call snoo#parser#parseComments(l:comments)
+
+	" We jump to the top of the page
+	execute "normal! gg"
 endfunction
 
 function! snoo#parser#parseComments(comments)
