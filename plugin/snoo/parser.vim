@@ -61,22 +61,23 @@ function! snoo#parser#parsePost(post)
 	setlocal buftype=nofile bufhidden=wipe noswapfile nobuflisted nomodified
 
 	let json = json_decode(a:post)
+	let l:maincomment = json[0].data.children[0]
 	let l:newline = ""
 
 	" We first display the header with the post title
 	let l:header = "=== "
-	let l:header .= json[0].data.children[0].data.title
+	let l:header .= l:maincomment.data.title
 	let l:header .= " ==="
 	silent put = l:header
 
 	" If the post has a selftext we display it
-	if has_key(json[0].data.children[0].data, 'selftext')
+	if has_key(l:maincomment.data, 'selftext')
 		silent put = l:newline
 		let l:border = "********************"
 		silent put = l:border
 		silent put = l:newline
 		
-		let l:post = json[0].data.children[0].data.selftext
+		let l:post = l:maincomment.data.selftext
 		silent put = l:post
 
 		silent put = l:newline
@@ -85,6 +86,27 @@ function! snoo#parser#parsePost(post)
 	endif
 
 	silent put = l:newline
+
+	let l:authorline = "    /u/"
+	let l:authorline .= l:maincomment.data.author
+
+	" If the comment was edited, we put a label '[edited]'
+	" The value of 'edited' is false if the comment is not edited, else it's a float indicating the time
+	if type(l:maincomment.data.edited) == 5
+		let l:authorline .= " [edited]"
+	endif
+
+	let l:authorline .= "   "
+	let l:authorline .= l:maincomment.data.score
+
+	" We display a label if the author is a moderator
+	if type(l:maincomment.data.distinguished) == 1
+		if l:maincomment.data.distinguished == "moderator"
+			let l:authorline .= " MOD "
+		endif
+	endif
+		
+	silent put = l:authorline
 
 	let l:commentsTitle = "=== COMMENTS ==="
 	silent put = l:commentsTitle
@@ -101,9 +123,6 @@ endfunction
 function! snoo#parser#parseComments(comments)
 	for comment in a:comments
 		call snoo#parser#displayComment(comment, 0)
-		" silent put = comment.data.body
-		" let l:newline = "-----"
-		" silent put = l:newline
 	endfor
 	call snoo#util#highlightPost()
 endfunction
@@ -125,10 +144,29 @@ function! snoo#parser#displayComment(comment, depth)
 
 	" If it has 'author' and 'body' it is an open comment
 	if has_key(a:comment.data, 'author') && has_key(a:comment.data, 'body')
+		" First line (username and score)
 		let l:authorline .= "/u/"
 		let l:authorline .= a:comment.data.author
+
+		" If the comment was edited, we put a label '[edited]'
+		" The value of 'edited' is false if the comment is not edited, else it's a float indicating the time
+		if type(a:comment.data.edited) == 5
+			let l:authorline .= " [edited]"
+		endif
+
+		let l:authorline .= "   "
+		let l:authorline .= a:comment.data.score
+
+		" We display a label if the author is a moderator
+		if type(a:comment.data.distinguished) == 1
+			if a:comment.data.distinguished == "moderator"
+				let l:authorline .= " MOD "
+			endif
+		endif
+
 		silent put = l:authorline
 
+		" Second line (comment)
 		let l:comment = l:leftpad
 		let l:comment .= a:comment.data.body
 		silent put = l:comment

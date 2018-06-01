@@ -2,16 +2,6 @@ function! snoo#util#highlight()
 	" Beautify the window with syntax highlighting.
 	if has("syntax") && exists("g:syntax_on")
 
-		" highlight default link twitterUser Identifier
-		highlight default link twitterTime String
-		highlight default link twitterTimeBar Ignore
-		highlight default link twitterTitle Title
-		highlight default link twitterTitleStar Ignore
-		highlight default link twitterLink Underlined
-		highlight default link twitterReply Label
-
-		syntax match postScoru /\[[0-9]*\]/
-
 		syntax match postScore /[0-9]* points/
 		syntax match numComments /\([0-9]* comments\)/
 		syntax match selfLabel /\(self\)/
@@ -25,6 +15,7 @@ function! snoo#util#highlight()
 		highlight default link subredditName Identifier
 		highlight default link subredditTitle Title
 		highlight default link nsfwLabel Title
+
 	endif
 endfunction
 
@@ -36,10 +27,13 @@ function! snoo#util#highlightPost()
 		syntax match userName /\/u\/[a-zA-Z0-9_.-]*/
 		syntax match closedName /\[\.\.\.\]/
 		syntax match closedComment /\[Closed comment\]/
+		syntax match editedLabel /\[edited\]/
 
 		highlight default link postTitle Title
 		highlight default link userName Identifier
 		highlight default link closedName Comment
 		highlight default link closedComment Comment
+		highlight default link editedLabel Title
+
 	endif
 endfunction
