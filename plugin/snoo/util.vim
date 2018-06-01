@@ -88,7 +88,7 @@ function! snoo#util#parseComments(comments)
 endfunction
 
 function! snoo#util#displayComment(comment, depth)
-	let l:depth = a:depth
+	let l:depth = a:comment.data.depth
 	let l:leftpad = ""
 	let l:authorline = ""
 	let i = 0
@@ -97,25 +97,35 @@ function! snoo#util#displayComment(comment, depth)
 		let l:leftpad .= "    |"
 		let i += 1
 	endwhile
-	let l:authorline .= "/u/"
-	let l:authorline .= a:comment.data.author
-	silent put = l:authorline
 
-	let l:comment = l:leftpad
-	let l:comment .= a:comment.data.body
-	silent put = l:comment
+	" If it has 'author' and 'body' it is an open comment
+	if has_key(a:comment.data, 'author') && has_key(a:comment.data, 'body')
+		let l:authorline .= "/u/"
+		let l:authorline .= a:comment.data.author
+		silent put = l:authorline
 
-	" Replies
-	if type(a:comment.data.replies) == type({})
-		if has_key(a:comment.data.replies, 'data')
-			if has_key(a:comment.data.replies.data, 'children')
-				if len(a:comment.data.replies.data.children) > 0
-					for child in a:comment.data.replies.data.children
-						call snoo#util#displayComment(child, l:depth+1)
-					endfor
+		let l:comment = l:leftpad
+		let l:comment .= a:comment.data.body
+		silent put = l:comment
+
+		" Replies
+		if type(a:comment.data.replies) == type({})
+			if has_key(a:comment.data.replies, 'data')
+				if has_key(a:comment.data.replies.data, 'children')
+					if len(a:comment.data.replies.data.children) > 0
+						for child in a:comment.data.replies.data.children
+							call snoo#util#displayComment(child, l:depth+1)
+						endfor
+					endif
 				endif
 			endif
 		endif
+	" Else it is a close comment (on Reddit you have to click on these to deploy them)
+	else
+		let l:closedauthor = "[.....]"
+		let l:closedcomment = "[Closed comment]"
+		silent put = l:closedauthor
+		silent put = l:closedcomment
 	endif
 	let l:newline = ""
 	silent put = l:newline
@@ -157,9 +167,13 @@ function! snoo#util#highlightPost()
 
 		syntax match postTitle /===.*===/
 		syntax match userName /\/u\/[a-zA-Z0-9_.-]*/
+		syntax match closedName /\[\.\.\.\]/
+		syntax match closedComment /\[Closed comment\]/
 
 		highlight default link postTitle Title
 		highlight default link userName Identifier
+		highlight default link closedName Comment
+		highlight default link closedComment Comment
 	endif
 endfunction
 
