@@ -39,12 +39,14 @@ function! snoo#parser#parsePostLine(postLine)
 	endif
 	silent put = l:firstline
 
-	" Selonde line: Number of comments, subreddit and NSFW badge
+	" Selonde line: Number of comments, author, subreddit and NSFW badge
 	let l:secondline = "          "
 	let l:secondline .= a:postLine.score
 	let l:secondline .= " points    ("
 	let l:secondline .= a:postLine.num_comments
-	let l:secondline .= " comments)    /r/"
+	let l:secondline .= " comments)    by /u/"
+	let l:secondline .= a:postLine.author
+	let l:secondline .= " in /r/"
 	let l:secondline .= a:postLine.subreddit
 	if (a:postLine.over_18)
 		let l:secondline .= "    NSFW"
@@ -82,13 +84,19 @@ function! snoo#parser#parsePost(post)
 
 		silent put = l:newline
 		silent put = l:border
-		silent put = l:newline
 	endif
 
 	silent put = l:newline
 
-	let l:authorline = "    /u/"
+	let l:authorline = "Posted by /u/"
 	let l:authorline .= l:maincomment.data.author
+
+	" We display a label if the author is a moderator
+	if type(l:maincomment.data.distinguished) == 1
+		if l:maincomment.data.distinguished == "moderator"
+			let l:authorline .= " [MOD] "
+		endif
+	endif
 
 	" If the comment was edited, we put a label '[edited]'
 	" The value of 'edited' is false if the comment is not edited, else it's a float indicating the time
@@ -98,15 +106,10 @@ function! snoo#parser#parsePost(post)
 
 	let l:authorline .= "   "
 	let l:authorline .= l:maincomment.data.score
+	let l:authorline .= " pts"
 
-	" We display a label if the author is a moderator
-	if type(l:maincomment.data.distinguished) == 1
-		if l:maincomment.data.distinguished == "moderator"
-			let l:authorline .= " MOD "
-		endif
-	endif
-		
 	silent put = l:authorline
+	silent put = l:newline
 
 	let l:commentsTitle = "=== COMMENTS ==="
 	silent put = l:commentsTitle
@@ -148,6 +151,13 @@ function! snoo#parser#displayComment(comment, depth)
 		let l:authorline .= "/u/"
 		let l:authorline .= a:comment.data.author
 
+		" We display a label if the author is a moderator
+		if type(a:comment.data.distinguished) == 1
+			if a:comment.data.distinguished == "moderator"
+				let l:authorline .= " [MOD] "
+			endif
+		endif
+
 		" If the comment was edited, we put a label '[edited]'
 		" The value of 'edited' is false if the comment is not edited, else it's a float indicating the time
 		if type(a:comment.data.edited) == 5
@@ -156,13 +166,7 @@ function! snoo#parser#displayComment(comment, depth)
 
 		let l:authorline .= "   "
 		let l:authorline .= a:comment.data.score
-
-		" We display a label if the author is a moderator
-		if type(a:comment.data.distinguished) == 1
-			if a:comment.data.distinguished == "moderator"
-				let l:authorline .= " MOD "
-			endif
-		endif
+		let l:authorline .= " pts"
 
 		silent put = l:authorline
 
