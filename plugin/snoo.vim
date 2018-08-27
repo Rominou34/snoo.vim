@@ -42,19 +42,31 @@ endfunction
 function! SearchSubreddit(...)
 	let l:sub = "All"
 	let l:search = ""
-	if(a:0 > 0)
+	let l:sort = "relevance"
+	if(a:0 > 1)
 		let l:sub = a:1
 		let l:search = a:2
 	else
 		let l:search = a:1
 	endif
+	if(a:0 > 2)
+		if(a:3 == "top")
+			let l:sort = "top"
+		elsif(a:3 == "new")
+			let l:sort = "new"
+		elsif(a:3 == "self")
+			let l:search .= "&is_self=1"
+		endif
+	endif
 	let l:url = "https://www.reddit.com/r/"
 	let l:url .= l:sub
 	let l:url .= "/search.json?q="
 	let l:url .= l:search
-	let l:url .= "&restrict_sr=on&sort=relevance&t=all"
+	let l:url .= "&restrict_sr=on&sort="
+	let l:url .= l:sort
+	let l:url .= "&t=all"
 
-	echo "Loading /r/".l:sub." posts..."
+	echo "Searching for posts containing the term '".l:search."' on /r/".l:sub
 
 	let l:reddit_username = "AyXiit34"
 	let result = system('curl -s -L "'.l:url.'" -H "User-Agent: Snoo.vim, used by /u/'.l:reddit_username.'"')

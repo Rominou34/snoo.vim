@@ -1,0 +1,90 @@
+*snoo.txt* Reddit client for vim
+
+	      -----------------------------
+	      Snoo: A Reddit client for Vim
+	      -----------------------------
+
+Author: Romain Arnaud <arnaud.romain34@gmail.com>
+		https://twitter.com/rominou34
+
+License: The Vim License applies to snoo.vim and snoo.txt.
+
+==============================================================================
+1. Contents                                         *Snoo* *Snoo-contents*
+
+	1. Contents...........................: Snoo-contents
+	2. Introduction.......................: Snoo-intro
+	3. Installation.......................: Snoo-install
+		cURL..............................: Snoo-curl
+	4. Commands...........................: Snoo-commands
+		:Snoo............................: :Snoo
+		:SnooSearch......................: :SnooSearch
+
+==============================================================================
+2. Introduction                                     *Snoo-intro*
+
+	Snoo is a basic that allows you to browse Reddit.
+	
+	Other existing plugins already allowed you to browse Reddit with
+	more advanced features than Snoo, but they all required a
+	special Vim install (with Python or things like that).
+	
+	Being a Windows user running Vim through Git bash, I wasn't
+	able to use these plugins, so I developped Snoo, which
+	is able to run with no dependencies at all, except for
+	the curl command.
+
+	The only (big) drawback is that the plugin does not have access
+	to oAuth, so you can't log into Reddit. Therefore, you
+	can't interact at all with the posts, you're just a lurker.
+
+==============================================================================
+3. Installation                                     *Snoo-install*
+
+	First of all, just clone the repo into your .vim/bundle folder
+	so it gets loaded by Pathogen (I only use Pathogen so I didn't
+	try any of the other plugin-loaders out there)
+
+	1. Install cURL.                                *Snoo-curl*
+
+	If you don't already have cURL on your system, download it
+	from http://curl.haxx.se/. Make sure that the curl
+	exectuable is in a directory listed in your PATH
+	environment variable, or the equivalent for your system.
+
+==============================================================================
+4. Commands                                         *Snoo-commands*
+
+	:Snoo <sub> <sort>                              *:Snoo*
+
+	This commands displays the last posts of a subreddit (if
+	none is specified, it will load /r/all)
+
+	- <sub> (Optional): The subreddit to load, default to "all"
+	- <sort> (Optional): The order in which you want the posts
+	sorted (hot/new/top), default to "hot"
+
+	Examples:
+		- :Snoo            > Loads the hot posts on /r/all
+		- :Snoo nichijou   > Loads the hot posts on /r/nichijou
+		- :Snoo dota2 top  > Loads the top posts on /r/dota2
+
+
+	:SnooSearch <sub> <search> <sort>               *:SnooSearch*
+
+	This commands search posts containing the specified term
+	(in the title or the selftext).
+
+	If more than one argument is specified, the first one
+	will be the subreddit and the second one the term to
+	search for, but if only one is specified, it will be the
+	term to search for, and the subreddit will default to /r/all
+
+	- <sub>: The subreddit to load, default to "all"
+	- <search>: The term to search for
+	- <sort>: The sorting order (relevance/new/top), default to
+	"relevance"
+
+	Examples:
+		- :SnooSearch test         > Searches for "test" on /r/all
+		- :SnooSearch dota2 skill  > Searches for "skill" on /r/dota2
